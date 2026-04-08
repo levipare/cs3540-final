@@ -11,6 +11,14 @@ CORRELATED_COLS_TO_DROP = [
 ]
 
 def clean(df: pd.DataFrame) -> pd.DataFrame:
+	"""Function for cleaning dataframe and dropping problematic columns
+
+	Args:
+		df (pd.DataFrame): Input dataframe to clean
+
+	Returns:
+		pd.DataFrame: Cleaned dataframe
+	"""
 	df = df.copy()
 
 	# clean up column names
