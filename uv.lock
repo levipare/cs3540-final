@@ -8,9 +8,6 @@ supported-markers = [
     "sys_platform == 'darwin'",
 ]
 
-[options]
-prerelease-mode = "allow"
-
 [manifest]
 overrides = [{ name = "pandas", specifier = ">=3.0.1" }]
 
