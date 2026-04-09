@@ -9,6 +9,23 @@ from src.data.cleaner import clean
 
 CACHE_PATH = Path('cache/cleaned.parquet')
 
+def load_raw() -> pd.DataFrame:
+	"""Download and concatenate raw CSVs from Kaggle with no cleaning applied.
+
+	Returns:
+		pd.DataFrame: Raw dataframe exactly as downloaded.
+	"""
+	load_dotenv()
+
+	print("Loading raw dataset from Kaggle...")
+	path = kagglehub.dataset_download("chethuhn/network-intrusion-dataset")
+	csv_files = glob.glob(os.path.join(path, "*.csv"))
+	df = pd.concat([pd.read_csv(f) for f in csv_files], ignore_index=True)
+	print(f"Raw shape: {df.shape[0]:,} rows, {df.shape[1]:,} columns")
+
+	return df
+
+
 def load_dataset(force_refresh: bool = False) -> pd.DataFrame:
 	"""Function for loading dataset from Kaggle with cleaning and caching
 
