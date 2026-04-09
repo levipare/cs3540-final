@@ -6,6 +6,8 @@ import seaborn as sns
 
 
 def plot_label_distribution(df):
+    df = df.copy()
+    df.columns = df.columns.str.strip()
     label_counts = df['Label'].value_counts()
 
     fig, ax = plt.subplots(figsize=(12, 6))
