@@ -3,7 +3,7 @@ name = "cs3540-final"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
     "imblearn>=0.0",
     "kaggle>=2.0.0",
@@ -17,6 +17,7 @@ dependencies = [
     "python-dotenv>=1.2.2",
     "scikit-learn>=1.8.0",
     "seaborn>=0.13.2",
+    "tensorflow>=2.21.0",
 ]
 
 [tool.pyright]
