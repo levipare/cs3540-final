@@ -25,7 +25,7 @@ venv=".venv"
 exclude=['.venv']
 
 [tool.uv]
-environments = ["sys_platform == 'darwin'"]
+environments = ["sys_platform == 'darwin' or sys_platform == 'linux'"]
 override-dependencies = [
     "pandas>=3.0.1",
 ]
