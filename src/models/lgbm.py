@@ -1,7 +1,5 @@
 """Utilities for training and evaluating LightGBM multiclass classifiers."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
 from typing import Any
 
@@ -17,7 +15,6 @@ class LGBMTrainingArtifacts:
 
     model: Any
     label_encoder: LabelEncoder
-
 
 
 def build_lightgbm_classifier(
@@ -72,7 +69,9 @@ def train_lightgbm_classifier(
 
         if early_stopping_rounds is not None:
             fit_kwargs["callbacks"] = [
-                lgb.early_stopping(stopping_rounds=early_stopping_rounds, verbose=verbose_eval),
+                lgb.early_stopping(
+                    stopping_rounds=early_stopping_rounds, verbose=verbose_eval
+                ),
             ]
 
     model.fit(X_train, y_train_encoded, **fit_kwargs)
