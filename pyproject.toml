@@ -16,12 +16,12 @@ dependencies = [
     "matplotlib>=3.10.8",
     "mlflow>=3.11.0rc1",
     "numpy>=2.0.2",
-    "pandas>=3.0.1",
+    "pandas>=2.3.3",
     "pyarrow>=18.0.0",
     "python-dotenv>=1.2.2",
     "scikit-learn>=1.8.0",
     "seaborn>=0.13.2",
-    "tensorflow==2.19.0",
+    "tensorflow[and-cuda]==2.19.0",
 ]
 
 [tool.pyright]
@@ -29,11 +29,6 @@ venvPath='.'
 venv=".venv"
 exclude=['.venv']
 
-[tool.uv]
-environments = ["sys_platform == 'darwin'"]
-override-dependencies = [
-    "pandas>=3.0.1",
-]
 
 [tool.setuptools.packages.find]
 where = ["."]
