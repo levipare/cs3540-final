@@ -73,7 +73,9 @@ def build_mlp_classifier(
 
     layers: list[keras.layers.Layer] = [keras.layers.Input(shape=(input_dim,))]
     for units in hidden_layer_sizes:
-        layers.append(keras.layers.Dense(units, activation="relu"))
+        layers.append(keras.layers.Dense(units, use_bias=False))
+        layers.append(keras.layers.BatchNormalization())
+        layers.append(keras.layers.ReLU())
         if dropout_rate > 0:
             layers.append(keras.layers.Dropout(dropout_rate))
 
@@ -82,7 +84,7 @@ def build_mlp_classifier(
     model = keras.Sequential(layers)
     print(model.summary())
     model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+        optimizer=keras.optimizers.AdamW(learning_rate=learning_rate, weight_decay=1e-4),
         loss=keras.losses.SparseCategoricalCrossentropy(),
         metrics=[keras.metrics.SparseCategoricalAccuracy(name="accuracy")],
         **compile_kwargs,

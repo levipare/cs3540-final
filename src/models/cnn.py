@@ -77,10 +77,11 @@ def build_cnn_classifier(
                 filters=filters,
                 kernel_size=kernel_size,
                 padding="same",
-                activation="relu",
+                use_bias=False,
             )
         )
         layers.append(keras.layers.BatchNormalization())
+        layers.append(keras.layers.ReLU())
         if i < len(conv_filters) - 1:
             layers.append(keras.layers.MaxPooling1D(pool_size=2))
         if dropout_rate > 0:
