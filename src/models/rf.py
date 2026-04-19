@@ -28,8 +28,8 @@ def build_rf_classifier(
         random_state=random_state,
         n_estimators=n_estimators,
         max_depth=max_depth,
-        class_weight="balanced",
         n_jobs=-1,
+        verbose=1,
         **kwargs,
     )
 
