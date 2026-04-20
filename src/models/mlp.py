@@ -10,6 +10,7 @@ import pandas as pd
 import tensorflow as tf
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.utils.class_weight import compute_class_weight
 import keras
 
 @dataclass
@@ -58,6 +59,18 @@ METRICS = [
       keras.metrics.AUC(name='prc', curve='PR'), # precision-recall curve
 ]
 
+def sparse_focal_loss(gamma=2.0, alpha=0.25):
+    def loss(y_true, y_pred):
+        y_true = tf.cast(y_true, tf.int32)
+        y_true_onehot = tf.one_hot(y_true, depth=tf.shape(y_pred)[-1])
+        y_pred = tf.clip_by_value(y_pred, 1e-7, 1.0 - 1e-7)
+
+        ce = -y_true_onehot * tf.math.log(y_pred)
+        pt = tf.where(tf.equal(y_true_onehot, 1), y_pred, 1 - y_pred)
+        focal = alpha * tf.pow(1 - pt, gamma) * ce
+        return tf.reduce_sum(focal, axis=1)
+    return loss
+
 def build_mlp_classifier(
     *,
     input_dim: int,
@@ -72,10 +85,10 @@ def build_mlp_classifier(
     keras.utils.set_random_seed(random_state)
 
     layers: list[keras.layers.Layer] = [keras.layers.Input(shape=(input_dim,))]
+    layers.append(keras.layers.Normalization())
     for units in hidden_layer_sizes:
-        layers.append(keras.layers.Dense(units, use_bias=False))
+        layers.append(keras.layers.Dense(units, activation="relu"))
         layers.append(keras.layers.BatchNormalization())
-        layers.append(keras.layers.ReLU())
         if dropout_rate > 0:
             layers.append(keras.layers.Dropout(dropout_rate))
 
@@ -84,7 +97,7 @@ def build_mlp_classifier(
     model = keras.Sequential(layers)
     print(model.summary())
     model.compile(
-        optimizer=keras.optimizers.AdamW(learning_rate=learning_rate, weight_decay=1e-4),
+        optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
         loss=keras.losses.SparseCategoricalCrossentropy(),
         metrics=[keras.metrics.SparseCategoricalAccuracy(name="accuracy")],
         **compile_kwargs,
@@ -102,7 +115,7 @@ def train_mlp_classifier(
     batch_size: int = 256,
     early_stopping_patience: int | None = 5,
     random_state: int = 42,
-    class_weight: str | dict[int, float] | None = None,
+    _class_weight: str | dict[int, float] | None = None,
     verbose: int = 0,
     **model_kwargs: Any,
 ) -> MLPTrainingArtifacts:
@@ -121,6 +134,11 @@ def train_mlp_classifier(
         random_state=random_state,
         **model_kwargs,
     )
+
+    classes = np.unique(y_train)
+    weights = compute_class_weight(class_weight="balanced", classes=classes, y=y_train)
+    class_weight = {c: float(w) for c, w in zip(classes, weights)}
+
 
     fit_kwargs: dict[str, Any] = {
         "epochs": epochs,
