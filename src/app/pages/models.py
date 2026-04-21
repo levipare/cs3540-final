@@ -55,6 +55,7 @@ attack_classes = [k for k in next(iter(report_dicts.values())) if k not in SKIP_
 st.subheader("Model Training Leaderboard")
 st.dataframe(build_leaderboard(report_dicts), use_container_width=True, hide_index=True)
 
+# bar chart comparing F1 scores for each attack class across models
 st.subheader("F1 Score Comparison by Attack Class")
 
 fig = go.Figure()
@@ -72,3 +73,11 @@ fig.update_layout(
 )
 st.plotly_chart(fig, use_container_width=True)
 
+# individual F1 charts for each model
+st.subheader("Per-Model F1 Charts")
+
+cols = st.columns(3)
+for i, (key, label) in enumerate(zip(MODEL_KEYS, MODEL_LABELS)):
+    img_path = RESULTS / F1_CHARTS[key]
+    with cols[i % 3]:
+        st.image(str(img_path), caption=label, use_container_width=True)
