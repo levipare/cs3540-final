@@ -1,21 +1,21 @@
                             precision    recall  f1-score   support
 
-                    BENIGN      1.000     0.865     0.927    314472
-                  DoS Hulk      0.899     0.997     0.945     25927
-                  PortScan      0.708     0.998     0.829     13623
-                      DDoS      0.852     0.999     0.920     19202
-               FTP-Patator      0.550     0.993     0.708       890
-             DoS GoldenEye      0.639     0.978     0.773      1543
-             DoS slowloris      0.456     0.978     0.622       807
-                       Bot      0.017     0.976     0.034       293
-               SSH-Patator      0.409     0.913     0.565       483
-          Web Attack - XSS      0.022     0.796     0.043        98
-  Web Attack - Brute Force      0.062     0.493     0.109       221
-          DoS Slowhttptest      0.305     0.977     0.465       784
-Web Attack - Sql Injection      0.001     1.000     0.002         3
-              Infiltration      0.002     0.667     0.005         6
-                Heartbleed      0.667     1.000     0.800         2
+                    BENIGN      1.000     0.806     0.893    157236
+                      DDoS      0.916     0.999     0.955      9601
+                  DoS Hulk      0.827     0.998     0.905     12963
+                  PortScan      0.710     0.996     0.829      6811
+  Web Attack - Brute Force      0.037     0.514     0.069       111
+               FTP-Patator      0.462     0.991     0.630       445
+             DoS GoldenEye      0.482     0.965     0.643       771
+             DoS slowloris      0.318     0.978     0.480       404
+                       Bot      0.012     0.993     0.025       147
+          DoS Slowhttptest      0.325     0.962     0.486       392
+               SSH-Patator      0.359     0.938     0.519       241
+          Web Attack - XSS      0.013     0.878     0.026        49
+Web Attack - Sql Injection      0.001     1.000     0.002         2
+              Infiltration      0.001     1.000     0.003         3
+                Heartbleed      0.333     1.000     0.500         1
 
-                  accuracy                          0.887    378354
-                 macro avg      0.439     0.909     0.516    378354
-              weighted avg      0.967     0.887     0.920    378354
+                  accuracy                          0.838    189177
+                 macro avg      0.386     0.934     0.464    189177
+              weighted avg      0.965     0.838     0.889    189177
