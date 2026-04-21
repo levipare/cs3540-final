@@ -1,10 +1,10 @@
-import streamlit as st
-from src.data.loader import load_dataset
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler, LabelEncoder
 import pandas as pd
 import plotly.express as px
+import streamlit as st
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 
+from src.data.loader import load_dataset
 
 st.set_page_config(layout="wide")
 st.title("PCA Analysis")

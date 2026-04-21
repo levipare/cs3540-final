@@ -1,4 +1,9 @@
+import sys
+from pathlib import Path
+
 import streamlit as st
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 
 pages = [
     st.Page("pages/pca.py", title="PCA", icon=":material/scatter_plot:"),
