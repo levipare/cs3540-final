@@ -55,3 +55,20 @@ attack_classes = [k for k in next(iter(report_dicts.values())) if k not in SKIP_
 st.subheader("Model Training Leaderboard")
 st.dataframe(build_leaderboard(report_dicts), use_container_width=True, hide_index=True)
 
+st.subheader("F1 Score Comparison by Attack Class")
+
+fig = go.Figure()
+for label, report in report_dicts.items():
+	f1_scores = [report.get(cls, {}).get("f1-score", 0.0) for cls in attack_classes]
+	fig.add_trace(go.Bar(name=label, x=attack_classes, y=f1_scores))
+
+fig.update_layout(
+    barmode="group",
+    xaxis_tickangle=-45,
+    yaxis=dict(range=[0, 1.1], title="F1 Score"),
+    xaxis_title="Attack Class",
+    height=500,
+    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+)
+st.plotly_chart(fig, use_container_width=True)
+
