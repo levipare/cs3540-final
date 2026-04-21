@@ -55,7 +55,7 @@ def load_artifacts():
 # load demo dataset from parquet, cache results
 @st.cache_data
 def load_demo_data() -> pd.DataFrame:
-    return pd.read_parquet(RESULTS / "demo_set.parquet")
+    return pd.read_parquet(RESULTS / "test_set.parquet")
 
 
 lr_art, rf_art, lgbm_art, mlp_art, cnn_art = load_artifacts()
