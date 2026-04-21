@@ -46,30 +46,9 @@ def _resolve_class_weight(
     }
 
 METRICS = [
-      keras.metrics.SparseCategoricalCrossentropy(name='cross entropy'),  # same as model's loss
-      keras.metrics.MeanSquaredError(name='Brier score'),
-      keras.metrics.TruePositives(name='tp'),
-      keras.metrics.FalsePositives(name='fp'),
-      keras.metrics.TrueNegatives(name='tn'),
-      keras.metrics.FalseNegatives(name='fn'),
-      keras.metrics.SparseCategoricalAccuracy(name="accuracy"),
-      keras.metrics.Precision(name='precision'),
-      keras.metrics.Recall(name='recall'),
-      keras.metrics.AUC(name='auc'),
-      keras.metrics.AUC(name='prc', curve='PR'), # precision-recall curve
+    keras.metrics.SparseCategoricalCrossentropy(name="cross_entropy"),
+    keras.metrics.SparseCategoricalAccuracy(name="accuracy"),
 ]
-
-def sparse_focal_loss(gamma=2.0, alpha=0.25):
-    def loss(y_true, y_pred):
-        y_true = tf.cast(y_true, tf.int32)
-        y_true_onehot = tf.one_hot(y_true, depth=tf.shape(y_pred)[-1])
-        y_pred = tf.clip_by_value(y_pred, 1e-7, 1.0 - 1e-7)
-
-        ce = -y_true_onehot * tf.math.log(y_pred)
-        pt = tf.where(tf.equal(y_true_onehot, 1), y_pred, 1 - y_pred)
-        focal = alpha * tf.pow(1 - pt, gamma) * ce
-        return tf.reduce_sum(focal, axis=1)
-    return loss
 
 def build_mlp_classifier(
     *,
@@ -99,7 +78,7 @@ def build_mlp_classifier(
     model.compile(
         optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
         loss=keras.losses.SparseCategoricalCrossentropy(),
-        metrics=[keras.metrics.SparseCategoricalAccuracy(name="accuracy")],
+        metrics=METRICS,
         **compile_kwargs,
     )
     return model

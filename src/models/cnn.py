@@ -10,7 +10,7 @@ import pandas as pd
 import keras
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-
+from sklearn.utils.class_weight import compute_class_weight
 
 @dataclass
 class CNNTrainingArtifacts:
@@ -63,7 +63,7 @@ def build_cnn_classifier(
     kernel_size: int = 3,
     dense_units: int = 128,
     dropout_rate: float = 0.2,
-    learning_rate: float = 1e-3,
+    learning_rate: float = 1e-2,
     **compile_kwargs: Any,
 ) -> keras.Model:
     """Create a compiled 1D CNN classifier for multiclass tabular data."""
@@ -77,17 +77,15 @@ def build_cnn_classifier(
                 filters=filters,
                 kernel_size=kernel_size,
                 padding="same",
-                use_bias=False,
+                activation="relu",
             )
         )
-        layers.append(keras.layers.BatchNormalization())
-        layers.append(keras.layers.ReLU())
-        if i < len(conv_filters) - 1:
-            layers.append(keras.layers.MaxPooling1D(pool_size=2))
+        if i < len(conv_filters):
+            layers.append(keras.layers.MaxPooling1D(2))
         if dropout_rate > 0:
             layers.append(keras.layers.Dropout(dropout_rate))
 
-    layers.append(keras.layers.GlobalAveragePooling1D())
+    layers.append(keras.layers.Flatten())
     if dense_units > 0:
         layers.append(keras.layers.Dense(dense_units, activation="relu"))
         if dropout_rate > 0:
@@ -96,8 +94,9 @@ def build_cnn_classifier(
     layers.append(keras.layers.Dense(num_classes, activation="softmax"))
 
     model = keras.Sequential(layers)
+    print(model.summary())
     model.compile(
-        optimizer=keras.optimizers.AdamW(learning_rate=learning_rate, weight_decay=1e-4),
+        optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
         loss=keras.losses.SparseCategoricalCrossentropy(),
         metrics=METRICS,
         **compile_kwargs,
@@ -115,7 +114,7 @@ def train_cnn_classifier(
     batch_size: int = 256,
     early_stopping_patience: int | None = 5,
     random_state: int = 42,
-    class_weight: str | dict[int, float] | None = None,
+    _class_weight: str | dict[int, float] | None = None,
     verbose: int = 0,
     **model_kwargs: Any,
 ) -> CNNTrainingArtifacts:
@@ -135,6 +134,10 @@ def train_cnn_classifier(
         random_state=random_state,
         **model_kwargs,
     )
+
+    classes = np.unique(y_train)
+    weights = compute_class_weight(class_weight="balanced", classes=classes, y=y_train)
+    class_weight = {c: float(w) for c, w in zip(classes, weights)}
 
     fit_kwargs: dict[str, Any] = {
         "epochs": epochs,
