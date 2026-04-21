@@ -3,32 +3,38 @@ from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 
 
-def resample(X_train: pd.DataFrame, y_train: pd.Series) -> tuple[pd.DataFrame, pd.Series]:
-	"""Balance the training set using undersampling on BENIGN followed by SMOTE on minority classes.
+def resample(
+    X_train: pd.DataFrame, y_train: pd.Series
+) -> tuple[pd.DataFrame, pd.Series]:
+    """Balance the training set using undersampling on BENIGN followed by SMOTE on minority classes.
 
-	The BENIGN class is undersampled to match the size of the largest attack class,
-	then SMOTE generates synthetic samples for all minority classes to match that size.
+    The BENIGN class is undersampled to match the size of the largest attack class,
+    then SMOTE generates synthetic samples for all minority classes to match that size.
 
-	Args:
-		X_train: Training features.
-		y_train: Training labels.
+    Args:
+            X_train: Training features.
+            y_train: Training labels.
 
-	Returns:
-		Tuple of (X_resampled, y_resampled) with balanced class distribution.
-	"""
-	# find the size of the largest minority (non-BENIGN) class
-	class_counts = y_train.value_counts()
-	largest_minority = class_counts.drop('BENIGN').max()
+    Returns:
+            Tuple of (X_resampled, y_resampled) with balanced class distribution.
+    """
 
-	# undersample BENIGN down to the largest minority class size
-	rus = RandomUnderSampler(sampling_strategy={'BENIGN': largest_minority}, random_state=42)
-	X_temp, y_temp = rus.fit_resample(X_train, y_train)
+    sampling_strategy = {
+        "SSH-Patator": 5000,
+        "Bot": 5000,
+        "Web Attack - Brute Force": 5000,
+        "Web Attack - XSS": 5000,
+        "Infiltration": 2000,
+        "Web Attack - Sql Injection": 2000,
+        "Heartbleed": 1000,
+    }
+    rus = RandomUnderSampler(sampling_strategy={"BENIGN": 500000}, random_state=42)
+    X_resampled, y_resampled = rus.fit_resample(X_train, y_train)
 
-	# oversample all minority classes up to match BENIGN
-	smote = SMOTE(random_state=42)
-	X_resampled, y_resampled = smote.fit_resample(X_temp, y_temp)
+    smote = SMOTE(sampling_strategy=sampling_strategy, random_state=42)
+    X_resampled, y_resampled = smote.fit_resample(X_resampled, y_resampled)
 
-	print("Resampled class distribution:")
-	print(pd.Series(y_resampled).value_counts().to_string())
+    print("Resampled class distribution:")
+    print(pd.Series(y_resampled).value_counts().to_string())
 
-	return X_resampled, y_resampled
+    return X_resampled, y_resampled
