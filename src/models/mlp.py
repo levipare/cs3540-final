@@ -94,7 +94,7 @@ def train_mlp_classifier(
     batch_size: int = 256,
     early_stopping_patience: int | None = 5,
     random_state: int = 42,
-    _class_weight: str | dict[int, float] | None = None,
+    class_weight: str | dict[int, float] | None = None,
     verbose: int = 0,
     **model_kwargs: Any,
 ) -> MLPTrainingArtifacts:
@@ -114,9 +114,10 @@ def train_mlp_classifier(
         **model_kwargs,
     )
 
-    classes = np.unique(y_train)
-    weights = compute_class_weight(class_weight="balanced", classes=classes, y=y_train)
-    class_weight = {c: float(w) for c, w in zip(classes, weights)}
+    if class_weight is None:
+        classes = np.unique(y_train)
+        weights = compute_class_weight(class_weight="balanced", classes=classes, y=y_train)
+        class_weight = {c: float(w) for c, w in zip(classes, weights)}
 
 
     fit_kwargs: dict[str, Any] = {
