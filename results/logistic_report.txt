@@ -1,21 +1,21 @@
                             precision    recall  f1-score   support
 
-                    BENIGN      1.000     0.774     0.872    419506
-                      DDoS      0.808     0.998     0.893     25616
-                  DoS Hulk      0.801     0.994     0.887     34587
-             DoS GoldenEye      0.414     0.969     0.580      2059
-          DoS Slowhttptest      0.218     0.967     0.356      1046
-                  PortScan      0.679     0.996     0.808     18173
-             DoS slowloris      0.237     0.951     0.379      1077
-               FTP-Patator      0.381     0.993     0.550      1187
-                       Bot      0.011     0.974     0.022       391
-  Web Attack - Brute Force      0.015     0.384     0.029       294
-               SSH-Patator      0.151     0.969     0.262       644
-          Web Attack - XSS      0.013     0.870     0.025       131
-              Infiltration      0.003     0.571     0.007         7
-                Heartbleed      0.091     0.500     0.154         2
-Web Attack - Sql Injection      0.000     0.250     0.000         4
+                    BENIGN      1.000     0.814     0.898    419506
+                      DDoS      0.881     0.999     0.936     25616
+                  DoS Hulk      0.838     0.997     0.911     34587
+             DoS GoldenEye      0.535     0.977     0.691      2059
+          DoS Slowhttptest      0.390     0.979     0.557      1046
+                  PortScan      0.702     0.998     0.824     18173
+             DoS slowloris      0.323     0.980     0.486      1077
+               FTP-Patator      0.454     0.993     0.623      1187
+                       Bot      0.012     0.980     0.023       391
+  Web Attack - Brute Force      0.026     0.500     0.050       294
+               SSH-Patator      0.169     0.970     0.288       644
+          Web Attack - XSS      0.012     0.786     0.023       131
+              Infiltration      0.003     0.714     0.007         7
+                Heartbleed      0.286     1.000     0.444         2
+Web Attack - Sql Injection      0.000     0.250     0.001         4
 
-                  accuracy                          0.811    504724
-                 macro avg      0.321     0.811     0.388    504724
-              weighted avg      0.955     0.811     0.866    504724
+                  accuracy                          0.845    504724
+                 macro avg      0.375     0.863     0.451    504724
+              weighted avg      0.963     0.845     0.893    504724
