@@ -18,15 +18,13 @@ def resample(
     Returns:
             Tuple of (X_resampled, y_resampled) with balanced class distribution.
     """
+    before_counts = pd.Series(y_train).value_counts()
 
     sampling_strategy = {
-        "SSH-Patator": 5000,
-        "Bot": 5000,
-        "Web Attack - Brute Force": 5000,
-        "Web Attack - XSS": 5000,
-        "Infiltration": 2000,
+        "Bot": 3000,
+        "Web Attack - Brute Force": 3000,
+        "Web Attack - XSS": 2000,
         "Web Attack - Sql Injection": 2000,
-        "Heartbleed": 1000,
     }
     rus = RandomUnderSampler(sampling_strategy={"BENIGN": 500000}, random_state=42)
     X_resampled, y_resampled = rus.fit_resample(X_train, y_train)
@@ -34,7 +32,15 @@ def resample(
     smote = SMOTE(sampling_strategy=sampling_strategy, random_state=42)
     X_resampled, y_resampled = smote.fit_resample(X_resampled, y_resampled)
 
-    print("Resampled class distribution:")
-    print(pd.Series(y_resampled).value_counts().to_string())
+    after_counts = pd.Series(y_resampled).value_counts()
+    comparison = (
+        pd
+        .DataFrame({"before": before_counts, "after": after_counts})
+        .fillna(0)
+        .astype(int)
+    )
+
+    print("Class distribution (before vs after):")
+    print(comparison.to_string())
 
     return X_resampled, y_resampled
