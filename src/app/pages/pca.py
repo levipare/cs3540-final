@@ -27,6 +27,7 @@ with st.spinner("Performing PCA..."):
     pca_df = pd.DataFrame(X_pca, columns=[f"PC{i + 1}" for i in range(X_pca.shape[1])])
     pca_df["label"] = y
 
+    # inverse-frequency weighted sampling
     counts = pca_df["label"].value_counts()
     weights = 1 / counts
     sample_weights = pca_df["label"].map(weights)
@@ -39,14 +40,26 @@ for i, e in enumerate(pca.explained_variance_ratio_):
     st.write(f"PC{i + 1}: {e:.2%}")
 st.write(f"Total: {sum(pca.explained_variance_ratio_):.2%}")
 
-st.subheader("3D PCA Scatter Plot")
-fig = px.scatter_3d(
-    pca_sample,
-    x="PC1",
-    y="PC2",
-    z="PC3",
-    color="label",
-    opacity=0.5,
-)
-fig.update_traces(marker=dict(size=5))
+view_mode = st.radio("PCA View Mode", ["2D", "3D"], horizontal=True)
+st.subheader(f"{view_mode} PCA Scatter Plot")
+if view_mode == "2D":
+    fig = px.scatter(
+        pca_sample,
+        x="PC1",
+        y="PC2",
+        color="label",
+        opacity=0.5,
+    )
+    fig.update_traces(marker_size=5)
+else:
+    fig = px.scatter_3d(
+        pca_sample,
+        x="PC1",
+        y="PC2",
+        z="PC3",
+        color="label",
+        opacity=0.5,
+    )
+    fig.update_traces(marker_size=5)
+
 st.plotly_chart(fig, height=700)
