@@ -69,3 +69,97 @@ MODELS = [
     ("MLP",                 mlp_art,  mlp_predict),
     ("CNN",                 cnn_art,  cnn_predict),
 ]
+
+# helper function to get confidence for a single sample from each model
+def get_confidence(name: str, artifacts, X_sample: pd.DataFrame) -> float:
+    if name == "Logistic Regression":
+        X_scaled = artifacts.scaler.transform(X_sample)
+        return float(artifacts.model.predict_proba(X_scaled)[0].max())
+    if name in ("Random Forest", "LightGBM"):
+        return float(artifacts.model.predict_proba(X_sample)[0].max())
+    if name == "MLP":
+        X_scaled = artifacts.scaler.transform(X_sample).astype(np.float32)
+        return float(artifacts.model.predict(X_scaled, verbose=0)[0].max())
+    # CNN
+    X_scaled = artifacts.scaler.transform(X_sample).astype(np.float32)
+    X_cnn = np.expand_dims(X_scaled, axis=-1)
+    return float(artifacts.model.predict(X_cnn, verbose=0)[0].max())
+
+# button to choose single sample or batch
+mode = st.radio("Mode", ["Single Sample", "Batch"], horizontal=True)
+
+if mode == "Single Sample":
+	# set the sample index in session state
+    if st.button(" New Random Sample") or "sample_idx" not in st.session_state:
+        st.session_state["sample_idx"] = int(np.random.randint(0, len(demo_df)))
+
+	# save the current sample index
+    idx = st.session_state["sample_idx"]
+	# get the sample and true label
+    X_sample = demo_df.drop("Label", axis=1).iloc[[idx]]
+    true_label = demo_df["Label"].iloc[idx]
+
+    st.markdown(f"**True label:** `{true_label}`")
+    st.caption(
+        " Confidence values for MLP and CNN are raw softmax outputs not confidence scores"
+	)
+	# build table, row for each model
+    rows = []
+    for name, artifacts, pred_fn in MODELS:
+        predicted = pred_fn(artifacts, X_sample).iloc[0]
+        confidence = get_confidence(name, artifacts, X_sample)
+        rows.append({
+            "Model": name,
+            "Predicted": predicted,
+            "Confidence": f"{confidence:.1%}",
+            "Correct": "Yes" if predicted == true_label else "Wrong",
+        })
+
+	# helper function to hightlight predictions
+    def highlight(row):
+        color = "#d4edda" if row["Correct"] == "Yes" else "#f8d7da"
+        return [f"background-color: {color}"] * len(row)
+
+	# display the table with highlighted rows
+    st.dataframe(
+        pd.DataFrame(rows).style.apply(highlight, axis=1),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+else:  # Batch mode
+    n = st.slider("Number of samples", min_value=10, max_value=200, value=50, step=10)
+
+    if st.button("Run Batch"):
+		# randomly sample n indices from the demo dataset
+        indices = np.random.choice(len(demo_df), size=n, replace=False)
+        X_batch = demo_df.drop("Label", axis=1).iloc[indices]
+        y_batch = demo_df["Label"].iloc[indices].values
+
+		# build table, row for each model
+        rows = []
+        for name, artifacts, pred_fn in MODELS:
+            y_pred = pred_fn(artifacts, X_batch).values
+            correct = int((y_pred == y_batch).sum())
+            rows.append({
+                "Model": name,
+                "Correct": correct,
+                "Total": n,
+                "Accuracy": f"{correct / n:.1%}",
+            })
+
+		# create dataframe to display
+        batch_df = pd.DataFrame(rows).sort_values("Correct", ascending=False)
+
+		# helper function to highlight the best performing model(s)
+        def highlight_batch(row):
+            best = batch_df["Correct"].max()
+            color = "#d4edda" if row["Correct"] == best else ""
+            return [f"background-color: {color}"] * len(row)
+
+		# display the table with hightlights
+        st.dataframe(
+            batch_df.style.apply(highlight_batch, axis=1),
+            use_container_width=True,
+            hide_index=True,
+        )
